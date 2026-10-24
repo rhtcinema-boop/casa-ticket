@@ -14,10 +14,10 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-180.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-180.png">
-<link rel="stylesheet" href="css/style.css?v=20261025042147">
+<link rel="stylesheet" href="css/style.css?v=20261025043754">
 <script>
   // 最新版チェック: 開いたとき・アプリに戻ったときに ver.txt を見て、新しければ自動で読み込み直す
-  window.TK_VER = '20261025042147';
+  window.TK_VER = '20261025043754';
   (function () {
     function check() {
       fetch('ver.txt?_=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -123,6 +123,10 @@
   .row:first-child { border-top: 0; }
   .row .main { font-size: 15px; font-weight: 600; line-height: 1.3; }
   .row .sub { font-size: 12px; color: var(--text2); margin-top: 3px; line-height: 1.4; }
+  .row > :first-child { min-width: 0; }
+  .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 12px; font-size: 12px; color: var(--text2); margin-top: 3px; line-height: 1.5; }
+  .meta > span { white-space: nowrap; }
+  .meta b { font-weight: 600; }
   .row .right { text-align: right; font-variant-numeric: tabular-nums; font-size: 16px; font-weight: 600; white-space: nowrap; }
   .row .right small { display: block; font-size: 11px; color: var(--text2); font-weight: 400; }
   .row.alert .main { color: var(--red); }
@@ -193,9 +197,9 @@
     <div class="two"><div class="side"><div class="card">
       <h3 data-l="sat.add">サテを登録</h3>
       <div class="grid">
+        <div class="wide"><label class="f" data-l="common.kind">券種</label><select id="s-kind"></select></div>
         <div><label class="f" data-l="common.date">日付</label><input type="date" id="s-date"></div>
         <div><label class="f" data-l="sat.time">時間 / サテ名</label><input type="text" id="s-time" data-lp="sat.timeHint" placeholder="例: 19:00"></div>
-        <div><label class="f" data-l="common.kind">券種</label><select id="s-kind"></select></div>
         <div><label class="f" data-l="sat.plan">予定枚数</label><input type="number" id="s-plan" inputmode="numeric"></div>
         <div><label class="f" data-l="sat.actual">実吐き出し</label><input type="number" id="s-actual" inputmode="numeric" placeholder="あとで"></div>
       </div>
@@ -208,7 +212,7 @@
           <div class="grid" style="margin-top:10px">
             <div><label class="f" data-l="sat.bulkMonth">対象月</label><input type="month" id="b-ym"></div>
             <div><label class="f" data-l="sat.time">時間 / サテ名</label><input type="text" id="b-time" placeholder="例: 19:00"></div>
-            <div><label class="f" data-l="common.kind">券種</label><select id="b-kind"></select></div>
+            <div class="wide"><label class="f" data-l="common.kind">券種</label><select id="b-kind"></select></div>
             <div><label class="f" data-l="sat.plan">予定枚数</label><input type="number" id="b-plan" inputmode="numeric"></div>
           </div>
           <button class="btn full" id="b-run" data-l="sat.bulkRun">まとめて登録</button>
@@ -229,8 +233,8 @@
     <div class="two"><div class="side"><div class="card">
       <h3 data-l="sale.add">手売りを記録</h3>
       <div class="grid">
+        <div class="wide"><label class="f" data-l="common.kind">券種</label><select id="h-kind"></select></div>
         <div><label class="f" data-l="common.date">日付</label><input type="date" id="h-date"></div>
-        <div><label class="f" data-l="common.kind">券種</label><select id="h-kind"></select></div>
         <div><label class="f" data-l="common.qty">枚数</label><input type="number" id="h-qty" inputmode="numeric" value="1"></div>
         <div><label class="f" data-l="sale.price">販売額(円)</label><input type="number" id="h-price" inputmode="numeric"></div>
       </div>
@@ -248,7 +252,7 @@
     <div class="two"><div class="side"><div class="card">
       <h3 data-l="buy.add">購入を追加</h3>
       <div class="grid">
-        <div><label class="f" data-l="common.kind">券種</label><select id="p-kind"></select></div>
+        <div class="wide"><label class="f" data-l="common.kind">券種</label><select id="p-kind"></select></div>
         <div><label class="f" data-l="buy.payDate">支払日</label><input type="date" id="p-pay"></div>
         <div><label class="f" data-l="buy.unit">単価(円)</label><input type="number" id="p-unit" inputmode="numeric"></div>
         <div><label class="f" data-l="common.qty">枚数</label><input type="number" id="p-qty" inputmode="numeric"></div>
@@ -301,10 +305,10 @@
 </nav>
 <div class="toast" id="toast"><div><div class="t1" id="toastT1"></div><div class="t2" id="toastT2"></div></div></div>
 
-<script src="config.js?v=20261025042147"></script>
-<script src="js/labels.js?v=20261025042147"></script>
-<script src="js/model.js?v=20261025042147"></script>
-<script src="js/api.js?v=20261025042147"></script>
-<script src="js/app.js?v=20261025042147"></script>
+<script src="config.js?v=20261025043754"></script>
+<script src="js/labels.js?v=20261025043754"></script>
+<script src="js/model.js?v=20261025043754"></script>
+<script src="js/api.js?v=20261025043754"></script>
+<script src="js/app.js?v=20261025043754"></script>
 </body>
 </html>
