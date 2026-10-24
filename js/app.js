@@ -65,7 +65,7 @@
   function renderSync() {
     const b = $('syncBtn'), s = $('syncSt');
     b.className = 'syncbtn';
-    if (API.mode === 'local') { s.textContent = L('common.localMode'); return; }
+    if (API.mode === 'local') { b.classList.add('local'); s.textContent = L('common.localMode'); return; }
     if (API.isSyncing()) { b.classList.add('spin'); s.textContent = L('common.syncing'); return; }
     if (API.lastError()) { b.classList.add('err'); s.textContent = L('common.syncErr'); return; }
     if (st.pendingCount) { b.classList.add('dirty'); s.textContent = st.pendingCount + L('common.pending'); return; }
@@ -80,10 +80,10 @@
     // 警告
     const pendingAll = st.sats.filter(s => String(s.store) === String(store) && (s.actual === '' || s.actual == null) && s.date < today).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
     const al = [];
-    pendingAll.forEach(s => al.push(`<div class="row alert" data-go="sat" data-ym="${s.date.slice(0, 7)}"><div><div class="main">${esc(L('home.alertSat'))}</div><div class="sub">${fmtD(s.date)} ${esc(s.time)} ${esc(kindName(s.kind))} ${L('home.plan')}${num(s.plan)}</div></div><div class="right">›</div></div>`));
-    m.unpaid.forEach(p => al.push(`<div class="row alert" data-go="buy" data-ym="${(p.payDate || '').slice(0, 7)}"><div><div class="main">${esc(L('home.alertUnpaid'))}</div><div class="sub">${fmtD(p.payDate)} ${esc(kindName(p.kind))} ${num(p.qty)}枚</div></div><div class="right">${yen(p.total)}</div></div>`));
-    stockNow.filter(x => x.warn).forEach(x => al.push(`<div class="row" data-go="home"><div><div class="main" style="color:#ff9500">${esc(L('home.alertExpire'))}</div><div class="sub">${esc(x.kind.name)} ${fmtD(x.kind.eventDate)}</div></div><div class="right">${num(x.left)}枚<small>${L('home.left')} ${x.daysLeft}日</small></div></div>`));
-    stockNow.filter(x => x.expired && x.left > 0).forEach(x => al.push(`<div class="row alert"><div><div class="main">${esc(L('home.alertExpired'))}</div><div class="sub">${esc(x.kind.name)} ${fmtD(x.kind.eventDate)}</div></div><div class="right">${num(x.left)}枚</div></div>`));
+    if (pendingAll.length) al.push(`<div class="row alert link" data-go="sat" data-ym="${pendingAll[0].date.slice(0, 7)}"><div><div class="main">${esc(L('home.alertSat'))} ${pendingAll.length}件</div><div class="sub">${pendingAll.slice(0, 3).map(s => `${fmtD(s.date)} ${esc(s.time)}`).join(' ・ ')}${pendingAll.length > 3 ? ' …' : ''}</div></div><div class="rc"><div class="right">${num(pendingAll.reduce((a, s) => a + n(s.plan), 0))}枚<small>${esc(L('home.plan'))}</small></div><span class="chev">›</span></div></div>`);
+    m.unpaid.forEach(p => al.push(`<div class="row alert link" data-go="buy" data-ym="${(p.payDate || '').slice(0, 7)}"><div><div class="main">${esc(L('home.alertUnpaid'))}</div><div class="sub">${fmtD(p.payDate)} ・ ${esc(kindName(p.kind))} ${num(p.qty)}枚</div></div><div class="rc"><div class="right">${yen(p.total)}</div><span class="chev">›</span></div></div>`));
+    stockNow.filter(x => x.warn).forEach(x => al.push(`<div class="row"><div><div class="main" style="color:#ff9500">${esc(L('home.alertExpire'))}</div><div class="sub">${esc(x.kind.name)} ・ ${fmtD(x.kind.eventDate)}</div></div><div class="right">${num(x.left)}枚<small>${L('home.left')} ${x.daysLeft}日</small></div></div>`));
+    stockNow.filter(x => x.expired && x.left > 0).forEach(x => al.push(`<div class="row alert"><div><div class="main">${esc(L('home.alertExpired'))}</div><div class="sub">${esc(x.kind.name)} ・ ${fmtD(x.kind.eventDate)}</div></div><div class="right">${num(x.left)}枚</div></div>`));
     $('alerts').innerHTML = al.length ? `<div class="list">${al.join('')}</div>` : `<div class="empty">${esc(L('home.noAlert'))}</div>`;
     $('dotHome').hidden = !al.some(x => x.includes('row alert'));
     // タイル
@@ -95,10 +95,11 @@
       <div><span>${esc(L('home.sale'))}</span><b>${num(m.sold)}</b><small>${yen(m.saleAmount)}</small></div>
       <div><span>${esc(L('home.used'))}</span><b>${num(m.used)}</b></div>
       <div><span>${esc(L('home.bought'))}</span><b>${num(m.bought)}</b><small>${yen(m.boughtAmount)}</small></div>
-      <div><span>${esc(L('home.cost'))}</span><b>${yen(m.cost)}</b></div>
+      <div><span>${esc(L('home.cost'))}</span><b class="money">${yen(m.cost)}</b></div>
       <div><span>${esc(L('home.carry'))}</span><b>${num(m.carry)}</b><small>${esc(L('common.sheets'))}</small></div>`;
     // 券種別
-    $('perKind').innerHTML = m.perKind.length ? m.perKind.map(x => `<div class="row"><div><div class="main">${esc(x.kind.name)}</div><div class="sub">${esc(L('home.budget'))} ${num(x.budget)} / ${esc(L('home.plan'))} ${num(x.plan)} / ${esc(L('home.bought'))} ${num(x.bought)}</div></div><div class="right">${num(x.actual)}<small>${esc(L('home.sale'))} ${num(x.sold)}</small></div></div>`).join('') : '';
+    $('perKind').innerHTML = m.perKind.length ? m.perKind.map(x => `<div class="row"><div><div class="main">${esc(x.kind.name)}</div><div class="sub">${esc(L('home.budget'))} ${num(x.budget)} ・ ${esc(L('home.plan'))} ${num(x.plan)} ・ ${esc(L('home.bought'))} ${num(x.bought)}</div></div><div class="right">${num(x.actual)}<small>${esc(L('home.actual'))} / ${esc(L('home.sale'))} ${num(x.sold)}</small></div></div>`).join('') : '';
+    $('perKind').hidden = !m.perKind.length;
     // 在庫(今日時点)
     $('stockList').innerHTML = stockNow.length ? `<div class="list">${stockNow.filter(x => x.left || x.waiting || !x.expired).map(x => `<div class="row"><div><div class="main">${esc(x.kind.name)}${x.expired ? ` <span class="tag ng">${esc(L('set.expired'))}</span>` : x.warn ? ` <span class="tag warn">${esc(L('home.left'))} ${x.daysLeft}日</span>` : ''}</div><div class="sub">${x.kind.eventDate ? fmtD(x.kind.eventDate) + ' ・ ' : ''}${yen(x.kind.unit)}${x.waiting ? ` ・ ${esc(L('home.stockWait'))} ${num(x.waiting)}` : ''}</div></div><div class="right ${x.left < 0 ? 'neg' : ''}">${num(x.left)}<small>${esc(L('home.stockIn'))}</small></div></div>`).join('')}</div>` : `<div class="empty">${esc(L('common.noKind'))}</div>`;
     $('report').textContent = M.report(m, storeName(store), L);
@@ -116,8 +117,8 @@
     $('satList').innerHTML = list.length ? list.map(s => {
       const pending = s.actual === '' || s.actual == null, past = s.date < today;
       const un = pending ? null : n(s.plan) - n(s.actual);
-      return `<div class="row ${pending && past ? 'alert' : ''}"><div><div class="main">${fmtD(s.date)} ${esc(s.time)} ・ ${esc(kindName(s.kind))}</div><div class="sub">${esc(L('sat.plan'))} ${num(s.plan)}${pending ? ` ・ <b>${esc(L('sat.notEntered'))}</b>` : ` ・ ${esc(L('sat.unspent'))} ${num(un)}`}${s.by ? ' ・ ' + esc(s.by) : ''}</div></div>
-        <div class="acts"><input class="inl" type="number" inputmode="numeric" data-sat="${esc(s.id)}" value="${pending ? '' : esc(s.actual)}" placeholder="${esc(L('common.qty'))}"><button class="danger" data-delsat="${esc(s.id)}">${esc(L('common.delete'))}</button></div></div>`;
+      return `<div class="row ${pending && past ? 'alert' : ''}"><div><div class="main">${fmtD(s.date)} ${esc(s.time)}</div><div class="sub">${esc(kindName(s.kind))}</div><div class="sub">${esc(L('sat.plan'))} ${num(s.plan)}枚${pending ? ` ・ <b class="${past ? 'neg' : ''}">${esc(L('sat.notEntered'))}</b>` : ` ・ ${esc(L('sat.unspent'))} ${num(un)}`}${s.by ? ' ・ ' + esc(s.by) : ''}</div></div>
+        <div class="acts"><input class="inl ${pending && past ? 'pending' : ''}" type="number" inputmode="numeric" data-sat="${esc(s.id)}" value="${pending ? '' : esc(s.actual)}" placeholder="${esc(L('common.qty'))}"><button class="iconbtn" data-delsat="${esc(s.id)}" aria-label="${esc(L('common.delete'))}">✕</button></div></div>`;
     }).join('') : `<div class="empty">—</div>`;
   }
 
@@ -127,7 +128,7 @@
     if (!$('h-date').value) $('h-date').value = today;
     const list = st.sales.filter(s => String(s.store) === String(store) && s.date.slice(0, 7) === saleYm).sort((a, b) => (b.date + b.ts).localeCompare(a.date + a.ts));
     const tq = list.reduce((s, x) => s + n(x.qty), 0), tp = list.reduce((s, x) => s + n(x.price), 0);
-    $('saleList').innerHTML = (list.length ? list.map(s => `<div class="row"><div><div class="main">${fmtD(s.date)} ・ ${esc(kindName(s.kind))}</div><div class="sub">${num(s.qty)}枚${s.by ? ' ・ ' + esc(s.by) : ''}</div></div><div class="acts"><div class="right">${yen(s.price)}</div><button class="danger" data-delsale="${esc(s.id)}">${esc(L('common.delete'))}</button></div></div>`).join('') : `<div class="empty">—</div>`)
+    $('saleList').innerHTML = (list.length ? list.map(s => `<div class="row"><div><div class="main">${fmtD(s.date)} ・ ${num(s.qty)}枚</div><div class="sub">${esc(kindName(s.kind))}${s.by ? ' ・ ' + esc(s.by) : ''}</div></div><div class="acts"><div class="right">${yen(s.price)}</div><button class="iconbtn" data-delsale="${esc(s.id)}" aria-label="${esc(L('common.delete'))}">✕</button></div></div>`).join('') : `<div class="empty">—</div>`)
       + (list.length ? `<div class="row"><div class="main">${esc(L('sale.total'))}</div><div class="right">${num(tq)}枚<small>${yen(tp)}</small></div></div>` : '');
   }
 
@@ -139,28 +140,29 @@
     const list = st.purchases.filter(p => String(p.store) === String(store) && (p.payDate || '').slice(0, 7) === buyYm).sort((a, b) => (b.payDate || '').localeCompare(a.payDate || ''));
     $('buyList').innerHTML = list.length ? list.map(p => {
       const wait = p.arriveDate && p.arriveDate > today;
-      return `<div class="row ${n(p.paid) ? '' : 'alert'}"><div><div class="main">${fmtD(p.payDate)} ・ ${esc(kindName(p.kind))} ${num(p.qty)}枚</div><div class="sub">${yen(p.unit)} × ${num(p.qty)} ・ ${esc(L('buy.arrive'))} ${fmtD(p.arriveDate)} <span class="tag ${wait ? 'wait' : 'ok'}">${esc(wait ? L('buy.waiting') : L('buy.arrived'))}</span>${p.note ? ' ・ ' + esc(p.note) : ''}</div></div>
-        <div class="acts"><div class="right">${yen(p.total)}</div><label class="tag ${n(p.paid) ? 'ok' : 'ng'}" style="display:flex;align-items:center;gap:4px"><input type="checkbox" data-paid="${esc(p.id)}" ${n(p.paid) ? 'checked' : ''} style="width:16px;height:16px;accent-color:var(--blue)">${esc(n(p.paid) ? L('buy.paidTag') : L('buy.unpaid'))}</label><button class="danger" data-delbuy="${esc(p.id)}">${esc(L('common.delete'))}</button></div></div>`;
+      return `<div class="row ${n(p.paid) ? '' : 'alert'}"><div><div class="main">${fmtD(p.payDate)} ・ ${num(p.qty)}枚 <span style="font-weight:400">${yen(p.total)}</span></div><div class="sub">${esc(kindName(p.kind))} ・ ${yen(p.unit)}/枚</div><div class="sub">${esc(L('buy.arrive'))} ${fmtD(p.arriveDate)} <span class="tag ${wait ? 'wait' : 'ok'}">${esc(wait ? L('buy.waiting') : L('buy.arrived'))}</span>${p.note ? ' ・ ' + esc(p.note) : ''}${p.by ? ' ・ ' + esc(p.by) : ''}</div></div>
+        <div class="acts"><label class="tag big ${n(p.paid) ? 'ok' : 'ng'}"><input type="checkbox" data-paid="${esc(p.id)}" ${n(p.paid) ? 'checked' : ''}>${esc(n(p.paid) ? L('buy.paidTag') : L('buy.unpaid'))}</label><button class="iconbtn" data-delbuy="${esc(p.id)}" aria-label="${esc(L('common.delete'))}">✕</button></div></div>`;
     }).join('') : `<div class="empty">—</div>`;
   }
 
   function renderSet() {
-    $('storeList').innerHTML = st.stores.length ? `<div class="list">${st.stores.map(s => `<div class="row"><input type="text" value="${esc(s.name)}" data-edit="stores:${esc(s.id)}" style="padding:7px 10px"><button class="danger" data-del="stores:${esc(s.id)}">${esc(L('common.delete'))}</button></div>`).join('')}</div>` : '';
-    $('staffList').innerHTML = st.staff.length ? `<div class="list">${st.staff.map(s => `<div class="row"><input type="text" value="${esc(s.name)}" data-edit="staff:${esc(s.id)}" style="padding:7px 10px"><button class="danger" data-del="staff:${esc(s.id)}">${esc(L('common.delete'))}</button></div>`).join('')}</div>` : '';
+    const nameRows = (table, list) => list.length ? `<div class="list">${list.map(s => `<div class="row edit"><input type="text" value="${esc(s.name)}" data-edit="${table}:${esc(s.id)}"><button class="iconbtn" data-del="${table}:${esc(s.id)}" aria-label="${esc(L('common.delete'))}">✕</button></div>`).join('')}</div>` : '';
+    $('storeList').innerHTML = nameRows('stores', st.stores);
+    $('staffList').innerHTML = nameRows('staff', st.staff);
     const ks = kinds($('k-showExpired').checked);
-    $('kindList').innerHTML = ks.length ? `<div class="list">${ks.map(k => `<div class="row" style="grid-template-columns:1fr auto"><div class="grid" style="grid-template-columns:2fr 1fr 1.3fr;gap:6px"><input type="text" value="${esc(k.name)}" data-kind="${esc(k.id)}:name" style="padding:7px 8px"><input type="number" value="${esc(k.unit)}" data-kind="${esc(k.id)}:unit" style="padding:7px 8px"><input type="date" value="${esc(k.eventDate || '')}" data-kind="${esc(k.id)}:eventDate" style="padding:7px 8px"></div><button class="danger" data-del="kinds:${esc(k.id)}">${esc(L('common.delete'))}</button></div>`).join('')}</div>` : `<div class="empty">—</div>`;
+    $('kindList').innerHTML = ks.length ? `<div class="list">${ks.map(k => `<div class="row edit"><div class="fields"><input type="text" value="${esc(k.name)}" data-kind="${esc(k.id)}:name" placeholder="${esc(L('set.kindName'))}"><div class="pair"><input type="number" value="${esc(k.unit)}" data-kind="${esc(k.id)}:unit" placeholder="${esc(L('set.kindUnit'))}"><input type="date" value="${esc(k.eventDate || '')}" data-kind="${esc(k.id)}:eventDate"></div></div><button class="iconbtn" data-del="kinds:${esc(k.id)}" aria-label="${esc(L('common.delete'))}">✕</button></div>`).join('')}</div>` : `<div class="empty">—</div>`;
     // 予算
     $('bgLabel').textContent = fmtYm(budgetYm);
     const bks = kinds(false);
     const bg = id => { const b = st.budgets.find(b => String(b.store) === String(store) && b.ym === budgetYm && String(b.kind) === String(id)); return b ? n(b.qty) : ''; };
-    $('budgetList').innerHTML = bks.length ? `<div class="list">${bks.map(k => `<div class="row"><div><div class="main">${esc(k.name)}</div><div class="sub">${yen(k.unit)}${k.eventDate ? ' ・ ' + fmtD(k.eventDate) : ''}</div></div><div class="acts"><input class="inl" type="number" inputmode="numeric" data-budget="${esc(k.id)}" value="${bg(k.id)}" placeholder="0"><span class="sub">${esc(L('common.sheets'))}</span></div></div>`).join('')}</div>` : `<div class="empty">${esc(L('common.noKind'))}</div>`;
+    $('budgetList').innerHTML = bks.length ? `<div class="list">${bks.map(k => `<div class="row"><div><div class="main">${esc(k.name)}</div><div class="sub">${yen(k.unit)}${k.eventDate ? ' ・ ' + fmtD(k.eventDate) : ''}</div></div><div class="acts"><input class="inl" type="number" inputmode="numeric" data-budget="${esc(k.id)}" value="${bg(k.id)}" placeholder="0"><span class="sub" style="margin:0">${esc(L('common.sheets'))}</span></div></div>`).join('')}</div>` : `<div class="empty">${esc(L('common.noKind'))}</div>`;
     const tq = bks.reduce((s, k) => s + n(bg(k.id)), 0), ta = bks.reduce((s, k) => s + n(bg(k.id)) * n(k.unit), 0);
     $('budgetTotal').textContent = `${L('set.budgetTotal')}: ${num(tq)}枚 / ${yen(ta)}`;
     // 文言
     const q = ($('l-q').value || '').trim();
     const ov = Object.fromEntries(st.labels.map(l => [l.id, l.value]));
     const keys = Labels.keys().filter(k => !q || k.includes(q) || Labels.DEFAULT[k].includes(q) || (ov[k] || '').includes(q));
-    $('labelList').innerHTML = `<div class="list">${keys.map(k => `<div class="row" style="grid-template-columns:1fr 1.4fr;gap:8px"><div><div class="main" style="font-size:13px">${esc(Labels.DEFAULT[k])}</div><div class="sub" style="font-family:ui-monospace,Menlo,monospace">${esc(k)}</div></div><input type="text" data-label="${esc(k)}" value="${esc(ov[k] || '')}" placeholder="${esc(Labels.DEFAULT[k])}" style="padding:7px 10px;font-size:14px"></div>`).join('')}</div>`;
+    $('labelList').innerHTML = `<div class="list">${keys.map(k => `<div class="row" style="grid-template-columns:minmax(0,1fr) minmax(0,1.3fr)"><div><div class="main" style="font-size:13px">${esc(Labels.DEFAULT[k])}</div><div class="sub" style="font-family:ui-monospace,Menlo,monospace;font-size:11px">${esc(k)}</div></div><input type="text" data-label="${esc(k)}" value="${esc(ov[k] || '')}" placeholder="${esc(Labels.DEFAULT[k])}" style="height:40px;font-size:15px"></div>`).join('')}</div>`;
     $('modeHint').textContent = API.mode === 'local' ? L('common.localMode') : '';
   }
 

@@ -8,7 +8,7 @@
     // 共通
     'app.title': 'casa チケット', 'common.save': '保存', 'common.add': '追加', 'common.delete': '削除', 'common.cancel': 'キャンセル',
     'common.edit': '編集', 'common.close': '閉じる', 'common.sheet': 'シート', 'common.sync': '同期', 'common.synced': '同期済み',
-    'common.pending': '件 未送信', 'common.syncing': '送信中…', 'common.syncErr': '同期エラー', 'common.localMode': 'テストモード(端末内のみ)',
+    'common.pending': '件 未送信', 'common.syncing': '送信中…', 'common.syncErr': '同期エラー', 'common.localMode': 'テストモード',
     'common.by': '入力者', 'common.date': '日付', 'common.kind': '券種', 'common.qty': '枚数', 'common.sheets': '枚', 'common.yen': '円',
     'common.store': '店舗', 'common.month': '月', 'common.all': '全部', 'common.noKind': '券種を先に登録してください(設定タブ)',
     'common.noStaff': '入力者を選んでください', 'common.confirmDel': '削除しますか？', 'common.copied': 'コピーしました', 'common.saved': '保存しました',

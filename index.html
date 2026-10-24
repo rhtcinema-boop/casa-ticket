@@ -35,122 +35,162 @@
 </script>
 <style>
   body { overscroll-behavior: none; overflow-wrap: anywhere; }
-  .wrap { max-width: 900px; margin: 0 auto; padding: calc(var(--sat) + 10px) 14px calc(var(--sab) + 96px); }
-  header { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: calc(var(--sat) + 10px) 14px calc(var(--sab) + 96px); }
+  @media (min-width: 700px) { .wrap { padding-left: 24px; padding-right: 24px; } }
+
+  /* ヘッダー */
+  header { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "l r" "s s"; align-items: center; gap: 10px 10px; margin-bottom: 12px; }
+  .hleft { grid-area: l; min-width: 0; } .hright { grid-area: r; } header .seg { grid-area: s; margin: 2px 0 0; }
+  @media (min-width: 700px) { header { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "l s r"; } header .seg { margin: 0 auto; width: 100%; max-width: 420px; } }
   h1 { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .04em; color: var(--text2); text-transform: uppercase; }
-  .ttl { font-size: 26px; font-weight: 700; letter-spacing: -.02em; }
-  .hright { display: flex; gap: 8px; align-items: center; }
-  .syncbtn { display: flex; flex-direction: column; align-items: center; border: 0; background: var(--fill); color: var(--blue); border-radius: 14px; padding: 7px 14px; min-width: 92px; }
-  .syncbtn b { font-size: 15px; font-weight: 600; } .syncbtn small { font-size: 10px; color: var(--text2); }
+  .ttl { font-size: 26px; font-weight: 700; letter-spacing: -.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hright { display: flex; gap: 8px; align-items: stretch; }
+  .syncbtn { display: flex; flex-direction: column; align-items: center; justify-content: center; border: 0; background: var(--fill); color: var(--blue); border-radius: 14px; padding: 6px 14px; min-width: 96px; max-width: 150px; }
+  .syncbtn b { font-size: 15px; font-weight: 600; } .syncbtn small { font-size: 12px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .syncbtn.local { background: rgba(255, 149, 0, .16); color: #c86a00; } .syncbtn.local small { color: #c86a00; }
+  @media (prefers-color-scheme: dark) { .syncbtn.local { color: #ffb340; } .syncbtn.local small { color: #ffb340; } }
   .syncbtn.dirty { background: var(--blue); color: #fff; } .syncbtn.dirty small { color: rgba(255,255,255,.85); }
   .syncbtn.err { background: var(--red); color: #fff; } .syncbtn.err small { color: #fff; }
   .syncbtn.spin { opacity: .55; }
-  .sheetbtn { background: var(--fill); color: var(--blue); border-radius: 14px; padding: 12px 14px; font-size: 15px; font-weight: 600; text-decoration: none; }
+  .sheetbtn { display: flex; align-items: center; background: var(--fill); color: var(--blue); border-radius: 14px; padding: 0 14px; font-size: 15px; font-weight: 600; text-decoration: none; }
 
   /* セグメント(店舗) */
-  .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 2px; padding: 3px; background: var(--fill); border-radius: 12px; margin-bottom: 10px; }
-  .seg button { border: 0; background: transparent; border-radius: 9px; padding: 9px 6px; font-size: 15px; font-weight: 600; color: var(--text2); }
+  .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 2px; padding: 3px; background: var(--fill); border-radius: 12px; margin-bottom: 12px; }
+  .seg button { border: 0; background: transparent; border-radius: 9px; padding: 9px 6px; font-size: 15px; font-weight: 600; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .seg button.on { background: var(--card); color: var(--text); box-shadow: var(--shadow); }
 
   /* 入力者チップ */
-  .chips { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 8px; scrollbar-width: none; }
+  .chips { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 10px; scrollbar-width: none; align-items: center; }
   .chips::-webkit-scrollbar { display: none; }
-  .chips button { flex: none; border: 0; background: var(--fill); color: var(--text); border-radius: 999px; padding: 8px 14px; font-size: 14px; font-weight: 600; }
+  .chips button { flex: none; border: 0; background: var(--fill); color: var(--text); border-radius: 999px; padding: 9px 16px; font-size: 15px; font-weight: 600; min-height: 38px; }
   .chips button.on { background: var(--blue); color: #fff; }
-  .chips .lbl { flex: none; font-size: 12px; color: var(--text2); align-self: center; }
+  .chips .lbl { flex: none; font-size: 12px; color: var(--text2); }
 
   /* 月切替 */
-  .month { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 4px 0 10px; }
-  .month b { font-size: 19px; letter-spacing: .04em; }
-  .month button { width: 38px; height: 38px; border-radius: 50%; border: 0; background: var(--fill); color: var(--blue); font-size: 20px; }
+  .month { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 4px 0 12px; }
+  .month b { font-size: 19px; letter-spacing: .04em; min-width: 7.5em; text-align: center; }
+  .month button { width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--fill); color: var(--blue); font-size: 22px; line-height: 1; }
 
   /* タブ(下固定) */
   nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: grid; grid-template-columns: repeat(5, 1fr); padding: 6px 8px calc(var(--sab) + 6px); background: var(--bar); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); border-top: 1px solid var(--sep); }
-  nav button { border: 0; background: transparent; color: var(--text2); font-size: 12px; font-weight: 600; padding: 8px 2px; border-radius: 10px; position: relative; }
+  nav button { border: 0; background: transparent; color: var(--text2); font-size: 12px; font-weight: 600; padding: 9px 2px; border-radius: 10px; position: relative; min-height: 44px; }
   nav button.on { color: var(--blue); }
-  nav button .dot { position: absolute; top: 4px; right: 18%; width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
+  nav button .dot { position: absolute; top: 6px; left: calc(50% + 14px); width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
+  @media (min-width: 700px) and (max-width: 1023px) { nav { max-width: 560px; left: 50%; right: auto; transform: translateX(-50%); bottom: 14px; border-radius: 18px; border: 1px solid var(--sep); padding: 6px 8px; box-shadow: 0 8px 30px rgba(0,0,0,.18); } nav button { font-size: 14px; } }
+  @media (min-width: 1024px) { nav { top: 0; bottom: auto; padding: 8px 24px; border-top: 0; border-bottom: 1px solid var(--sep); grid-template-columns: repeat(5, 132px); justify-content: center; } nav button { font-size: 15px; min-height: 40px; } .wrap { padding-top: 74px; padding-bottom: 60px; } }
   .tab { display: none; } .tab.on { display: block; }
 
+  /* PC: フォームと一覧を横並び */
+  .two { display: block; }
+  @media (min-width: 900px) { .two { display: grid; grid-template-columns: minmax(360px, 460px) minmax(0, 1fr); gap: 16px; align-items: start; } .two > .side { position: sticky; top: 74px; } }
+
   /* カード・フォーム */
-  .card { padding: 12px 14px; margin-bottom: 10px; }
-  .card h3 { margin: 0 0 10px; font-size: 13px; font-weight: 600; color: var(--text2); letter-spacing: .03em; }
+  .card { padding: 14px; margin-bottom: 12px; }
+  .card h3, .sec { margin: 0 0 10px; font-size: 13px; font-weight: 600; color: var(--text2); letter-spacing: .03em; }
+  .sec { margin: 16px 0 8px; }
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  @media (min-width: 600px) { .grid { grid-template-columns: repeat(4, 1fr); } .grid .wide { grid-column: span 2; } }
-  label.f { display: block; font-size: 12px; color: var(--text2); margin-bottom: 4px; }
-  input[type=number], input[type=date], input[type=text], input[type=time], input[type=search], select { width: 100%; padding: 10px 11px; border-radius: 10px; border: 0; background: var(--fill); color: var(--text); font: inherit; font-size: 16px; }
+  .grid .wide { grid-column: 1 / -1; }
+  label.f { display: block; font-size: 12px; color: var(--text2); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  input[type=number], input[type=date], input[type=text], input[type=time], input[type=month], input[type=search], select { width: 100%; min-width: 0; height: 44px; padding: 0 12px; border-radius: 10px; border: 0; background: var(--fill); color: var(--text); font: inherit; font-size: 16px; -webkit-appearance: none; appearance: none; }
+  input[type=date], input[type=month] { padding-right: 6px; }
+  select { background-image: linear-gradient(45deg, transparent 50%, var(--text2) 50%), linear-gradient(135deg, var(--text2) 50%, transparent 50%); background-position: calc(100% - 16px) 50%, calc(100% - 11px) 50%; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 28px; text-overflow: ellipsis; }
+  input:focus, select:focus { outline: 2px solid var(--blue); outline-offset: 0; }
   input:read-only { color: var(--blue); }
-  .chk { display: flex; align-items: center; gap: 8px; font-size: 15px; padding: 10px 0 2px; }
-  .chk input { width: 22px; height: 22px; accent-color: var(--blue); }
-  .btn.full { width: 100%; margin-top: 10px; padding: 13px; font-size: 16px; }
-  .btn.sm { padding: 7px 12px; font-size: 13px; border-radius: 10px; }
+  .chk { display: flex; align-items: center; gap: 10px; font-size: 15px; padding: 10px 0 2px; min-height: 40px; }
+  .chk input { width: 22px; height: 22px; accent-color: var(--blue); flex: none; }
+  .btn.full { width: 100%; margin-top: 12px; padding: 13px; font-size: 16px; }
+  .btn.sm { padding: 0 14px; height: 40px; font-size: 14px; border-radius: 10px; white-space: nowrap; }
   .btn.xs { padding: 4px 10px; font-size: 12px; border-radius: 8px; }
   .dow { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-  .dow button { border: 0; background: var(--fill); border-radius: 10px; padding: 10px 0; font-weight: 600; }
+  .dow button { border: 0; background: var(--fill); border-radius: 10px; height: 42px; font-weight: 600; font-size: 15px; }
   .dow button.on { background: var(--blue); color: #fff; }
+  .dow button:nth-child(1) { color: var(--red); } .dow button:nth-child(7) { color: var(--blue); } .dow button.on { color: #fff; }
 
   /* 集計タイル */
-  .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
-  @media (min-width: 600px) { .tiles { grid-template-columns: repeat(4, 1fr); } }
-  .tiles div { background: var(--card); border-radius: 12px; padding: 10px 12px; box-shadow: var(--shadow); }
-  .tiles span { display: block; font-size: 11px; color: var(--text2); }
-  .tiles b { display: block; font-size: 21px; margin-top: 3px; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
-  .tiles small { display: block; font-size: 11px; color: var(--text2); margin-top: 1px; }
+  .tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
+  @media (min-width: 480px) { .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (min-width: 900px) { .tiles { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); } .tiles span, .tiles small { font-size: 13px; } .tiles b { font-size: 26px; } .tiles b.money { font-size: 22px; } }
+  .tiles div { background: var(--card); border-radius: 12px; padding: 10px 12px; box-shadow: var(--shadow); min-width: 0; }
+  .tiles span { display: block; font-size: 11px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tiles b { display: block; font-size: 22px; margin-top: 3px; font-variant-numeric: tabular-nums; letter-spacing: -.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tiles b.money { font-size: 18px; }
+  .tiles small { display: block; font-size: 11px; color: var(--text2); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .tiles b.warn { color: var(--red); } .tiles b.ok { color: #34c759; }
 
-  /* リスト */
+  /* リスト行: 左は縮む、右は縮まない */
   .list { padding: 0; overflow: hidden; }
-  .row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; padding: 11px 14px; border-top: 1px solid var(--sep); }
+  .row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 12px 14px; border-top: 1px solid var(--sep); min-height: 56px; }
   .row:first-child { border-top: 0; }
-  .row .main { font-size: 15px; font-weight: 600; } .row .sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
-  .row .right { text-align: right; font-variant-numeric: tabular-nums; font-size: 15px; }
-  .row .right small { display: block; font-size: 11px; color: var(--text2); }
+  .row .main { font-size: 15px; font-weight: 600; line-height: 1.3; }
+  .row .sub { font-size: 12px; color: var(--text2); margin-top: 3px; line-height: 1.4; }
+  .row .right { text-align: right; font-variant-numeric: tabular-nums; font-size: 16px; font-weight: 600; white-space: nowrap; }
+  .row .right small { display: block; font-size: 11px; color: var(--text2); font-weight: 400; }
   .row.alert .main { color: var(--red); }
-  .row input.inl { width: 72px; padding: 7px 8px; font-size: 16px; text-align: right; }
-  .row .acts { display: flex; gap: 6px; align-items: center; }
-  .tag { font-size: 11px; padding: 2px 8px; }
+  .row.link { cursor: pointer; } .row.link:active { background: var(--fill); }
+  .chev { color: var(--text2); font-size: 20px; line-height: 1; }
+  .row .rc { display: flex; align-items: center; gap: 8px; }
+  .row .acts { display: flex; gap: 14px; align-items: center; }
+  .row input.inl { width: 76px; height: 40px; padding: 0 10px; font-size: 17px; text-align: right; font-weight: 600; }
+  .row input.inl::placeholder { font-weight: 400; font-size: 13px; }
+  .row input.inl.pending { outline: 2px solid var(--red); outline-offset: -2px; }
+  .row.edit { grid-template-columns: minmax(0, 1fr) auto; }
+  .row.edit input { height: 40px; }
+  .row.edit .fields { display: grid; grid-template-columns: 1fr; gap: 6px; }
+  .row.edit .fields .pair { display: grid; grid-template-columns: 1fr 1.5fr; gap: 6px; }
+  .tag { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 2px 8px; height: 22px; white-space: nowrap; }
   .tag.ok { color: #34c759; } .tag.ng { color: var(--red); } .tag.wait { color: var(--teal); } .tag.warn { color: #ff9500; }
-  .empty { padding: 20px; text-align: center; color: var(--text2); font-size: 13px; }
+  .tag input { width: 18px; height: 18px; accent-color: var(--blue); margin: 0; }
+  label.tag.big { height: 44px; padding: 0 12px; border-radius: 12px; font-size: 13px; cursor: pointer; }
+  .empty { padding: 22px; text-align: center; color: var(--text2); font-size: 13px; }
   .neg { color: var(--red); }
-  pre.rep { white-space: pre-wrap; font: 13px/1.6 ui-monospace, Menlo, monospace; margin: 0; color: var(--text); }
-  .hint { font-size: 12px; color: var(--text2); margin: 6px 0 0; }
+  .rep { white-space: pre-wrap; font-size: 14px; line-height: 1.7; margin: 0; color: var(--text); font-variant-numeric: tabular-nums; }
+  .hint { font-size: 12px; color: var(--text2); margin: 6px 0 0; line-height: 1.5; }
   .inline { display: flex; gap: 8px; align-items: center; }
-  .inline input { flex: 1; }
-  .toast { top: auto; bottom: calc(var(--sab) + 80px); }
-  .danger { color: var(--red); background: transparent; border: 0; font-size: 13px; padding: 6px 8px; }
-  details summary { cursor: pointer; font-size: 13px; font-weight: 600; color: var(--blue); padding: 6px 0; list-style: none; }
+  .inline > input { flex: 1; min-width: 0; }
+  .between { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .toast { top: auto; bottom: calc(var(--sab) + 84px); }
+  .danger { color: var(--red); background: transparent; border: 0; font-size: 14px; padding: 0 8px; height: 40px; white-space: nowrap; }
+  .iconbtn { width: 44px; height: 44px; border: 0; background: var(--fill); border-radius: 10px; color: var(--red); font-size: 18px; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+  details summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--blue); padding: 8px 0 2px; list-style: none; }
   details summary::-webkit-details-marker { display: none; }
+  details summary::before { content: '＋ '; } details[open] summary::before { content: '－ '; }
+  .stack2 { display: grid; gap: 10px; }
+  @media (min-width: 900px) { .stack2 { grid-template-columns: 1fr 1fr; align-items: start; } }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div><h1 data-l="app.title">casa チケット</h1><div class="ttl" id="hTitle"></div></div>
+    <div class="hleft"><h1 data-l="app.title">casa チケット</h1><div class="ttl" id="hTitle"></div></div>
+    <div class="seg" id="storeSeg"></div>
     <div class="hright">
       <a class="sheetbtn" id="sheetLink" target="_blank" rel="noopener" data-l="common.sheet">シート</a>
       <button class="syncbtn" id="syncBtn"><b data-l="common.sync">同期</b><small id="syncSt"></small></button>
     </div>
   </header>
 
-  <div class="seg" id="storeSeg"></div>
-
   <!-- ホーム -->
   <section class="tab" id="tab-home">
     <div class="month"><button id="mPrev">‹</button><b id="mLabel"></b><button id="mNext">›</button></div>
     <div class="card"><h3 data-l="home.alerts">確認が必要</h3><div id="alerts"></div></div>
-    <h3 style="margin:14px 0 8px;font-size:13px;color:var(--text2)" data-l="home.month">当月サマリー</h3>
+    <h3 class="sec" data-l="home.month">当月サマリー</h3>
     <div class="tiles" id="tiles"></div>
-    <div class="card list" id="perKind"></div>
-    <div class="card"><h3 data-l="home.stock">券種別 在庫</h3><div id="stockList"></div></div>
-    <div class="card">
-      <div class="inline" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0" data-l="home.report">月次レポート</h3><button class="btn sm" id="copyRep" data-l="home.copy">レポートをコピー</button></div>
-      <pre class="rep" id="report"></pre>
+    <div class="stack2">
+      <div>
+        <div class="card list" id="perKind"></div>
+        <div class="card"><h3 data-l="home.stock">券種別 在庫</h3><div id="stockList"></div></div>
+      </div>
+      <div class="card">
+        <div class="between"><h3 style="margin:0" data-l="home.report">月次レポート</h3><button class="btn sm" id="copyRep" data-l="home.copy">レポートをコピー</button></div>
+        <div class="rep" id="report"></div>
+      </div>
     </div>
   </section>
 
   <!-- サテ -->
   <section class="tab" id="tab-sat">
     <div class="chips" id="staffChips1"></div>
-    <div class="card">
+    <div class="two"><div class="side"><div class="card">
       <h3 data-l="sat.add">サテを登録</h3>
       <div class="grid">
         <div><label class="f" data-l="common.date">日付</label><input type="date" id="s-date"></div>
@@ -174,16 +214,19 @@
           <button class="btn full" id="b-run" data-l="sat.bulkRun">まとめて登録</button>
         </div>
       </details>
-    </div>
+    </div></div>
+    <div>
     <div class="month"><button id="sPrev">‹</button><b id="sLabel"></b><button id="sNext">›</button></div>
-    <div class="inline" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0;font-size:13px;color:var(--text2)" data-l="sat.list">サテ一覧</h3><label class="chk" style="padding:0;font-size:13px"><input type="checkbox" id="s-onlyPending"> <span data-l="sat.filterPending">未入力だけ</span></label></div>
+    <div class="between"><h3 class="sec" style="margin:0" data-l="sat.list">サテ一覧</h3><label class="chk" style="padding:0;font-size:14px;min-height:0"><input type="checkbox" id="s-onlyPending"> <span data-l="sat.filterPending">未入力だけ</span></label></div>
+    <p class="hint" style="margin:0 0 8px" data-l="sat.enterHint">実枚数を入れて保存</p>
     <div class="card list" id="satList"></div>
+    </div></div>
   </section>
 
   <!-- 手売り -->
   <section class="tab" id="tab-sale">
     <div class="chips" id="staffChips2"></div>
-    <div class="card">
+    <div class="two"><div class="side"><div class="card">
       <h3 data-l="sale.add">手売りを記録</h3>
       <div class="grid">
         <div><label class="f" data-l="common.date">日付</label><input type="date" id="h-date"></div>
@@ -192,15 +235,17 @@
         <div><label class="f" data-l="sale.price">販売額(円)</label><input type="number" id="h-price" inputmode="numeric"></div>
       </div>
       <button class="btn gold full" id="h-add" data-l="sale.add">手売りを記録</button>
-    </div>
+    </div></div>
+    <div>
     <div class="month"><button id="hPrev">‹</button><b id="hLabel"></b><button id="hNext">›</button></div>
     <div class="card list" id="saleList"></div>
+    </div></div>
   </section>
 
   <!-- 購入 -->
   <section class="tab" id="tab-buy">
     <div class="chips" id="staffChips3"></div>
-    <div class="card">
+    <div class="two"><div class="side"><div class="card">
       <h3 data-l="buy.add">購入を追加</h3>
       <div class="grid">
         <div><label class="f" data-l="common.kind">券種</label><select id="p-kind"></select></div>
@@ -213,13 +258,16 @@
       </div>
       <label class="chk"><input type="checkbox" id="p-paid"> <span data-l="buy.paid">請求書 支払い済み</span></label>
       <button class="btn gold full" id="p-add" data-l="buy.add">購入を追加</button>
-    </div>
+    </div></div>
+    <div>
     <div class="month"><button id="pPrev">‹</button><b id="pLabel"></b><button id="pNext">›</button></div>
     <div class="card list" id="buyList"></div>
+    </div></div>
   </section>
 
   <!-- 設定 -->
   <section class="tab" id="tab-set">
+    <div class="stack2"><div>
     <div class="card"><h3 data-l="set.store">店舗</h3><div id="storeList"></div>
       <div class="inline" style="margin-top:8px"><input type="text" id="st-name" data-lp="set.name" placeholder="名前"><button class="btn sm" id="st-add" data-l="set.addStore">店舗を追加</button></div></div>
     <div class="card"><h3 data-l="set.staff">スタッフ(入力者)</h3><div id="staffList"></div>
@@ -228,17 +276,19 @@
       <div id="kindList"></div>
       <label class="chk" style="font-size:13px"><input type="checkbox" id="k-showExpired"> <span data-l="set.showExpired">期限切れも表示</span></label>
       <div class="grid" style="margin-top:6px">
-        <div class="wide"><label class="f" data-l="set.kindName">大会名</label><input type="text" id="k-name"></div>
+        <div class="wide"><label class="f" data-l="set.kindName">大会名</label><input type="text" id="k-name" placeholder="例: JOPT 2026 Winter"></div>
         <div><label class="f" data-l="set.kindUnit">単価(円)</label><input type="number" id="k-unit" inputmode="numeric"></div>
         <div><label class="f" data-l="set.kindDate">大会日 / 有効期限</label><input type="date" id="k-date"></div>
       </div>
       <button class="btn full" id="k-add" data-l="set.addKind">券種を追加</button></div>
+    </div><div>
     <div class="card"><h3 data-l="set.budget">月予算(券種ごとの枚数)</h3>
       <div class="month"><button id="bgPrev">‹</button><b id="bgLabel"></b><button id="bgNext">›</button></div>
       <div id="budgetList"></div><div class="hint" id="budgetTotal"></div></div>
     <div class="card"><h3 data-l="set.labels">文言(画面の文字)</h3><p class="hint" data-l="set.labelsHint" style="margin:0 0 8px"></p>
       <input type="search" id="l-q" data-lp="set.labelsSearch" placeholder="文言を検索"><div id="labelList" style="margin-top:8px"></div></div>
     <div class="card"><h3 data-l="set.data">データ</h3><button class="btn full" id="export" data-l="set.export">JSONを書き出す</button><p class="hint" id="modeHint"></p></div>
+    </div></div>
   </section>
 </div>
 
