@@ -3,7 +3,7 @@
 ## URL
 - アプリ: https://rhtcinema-boop.github.io/casa-ticket/
 - 反映先シート: https://docs.google.com/spreadsheets/d/1RTufjcm2KRMxD64zar1PzzYWkIyvEKYLOYsXdFRV-qg/edit
-- Apps Script(上のシートに付属): シートの「拡張機能 → Apps Script」
+- Apps Script(上のシートに付属): シートの「拡張機能 → Apps Script」。デプロイ済み(全員アクセス、2026-10-28)
 
 ## Google シート接続(初回のみ。貸卓と同じ手順)
 1. 上のシートを開く →「拡張機能」→「Apps Script」
